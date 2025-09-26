@@ -1,16 +1,40 @@
 stages:
+  - build
   - zap_scan
 
-zap_scan:
-  image: owasp/zap2docker-stable
-  stage: zap_scan
+# Stage 1: Build your app Docker image
+build_app:
+  stage: build
+  image: docker:20.10.24
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
   script:
-    - echo "Starting OWASP ZAP Scan..."
-    - pip install -r requirements.txt
-    - python app.py & 
-    - sleep 5 
-    - zap-baseline.py -t http://host.docker.internal:5000 -r zap-report.html
+    - echo "Building app Docker image..."
+    - docker build -t my-app day2/
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - day2/
+
+# Stage 2: Run ZAP scan
+zap_scan:
+  stage: zap_scan
+  image: docker:20.10.24
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+  script:
+    - echo "Running app container..."
+    - docker run -d --name my-app-container -p 5000:5000 my-app
+    - echo "Starting OWASP ZAP scan..."
+    - docker run --rm --network container:my-app-container \
+      -v $PWD/day2:/zap/wrk/:rw \
+      owasp/zap2docker-stable zap-baseline.py \
+      -t http://my-app-container:5000/login \
+      -r /zap/wrk/zap-report.html
   artifacts:
     paths:
       - day2/zap-report.html
-

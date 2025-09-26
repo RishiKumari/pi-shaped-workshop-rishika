@@ -12,4 +12,5 @@ zap_scan:
     - zap-baseline.py -t http://host.docker.internal:5000 -r zap-report.html
   artifacts:
     paths:
-      - DAY2/zap-report.html
+      - day2/zap-report.html
+

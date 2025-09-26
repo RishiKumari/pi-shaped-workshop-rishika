@@ -1,0 +1,15 @@
+stages:
+  - zap_scan
+
+zap_scan:
+  image: owasp/zap2docker-stable
+  stage: zap_scan
+  script:
+    - echo "Starting OWASP ZAP Scan..."
+    - pip install -r requirements.txt
+    - python app.py & 
+    - sleep 5 
+    - zap-baseline.py -t http://host.docker.internal:5000 -r zap-report.html
+  artifacts:
+    paths:
+      - DAY2/zap-report.html

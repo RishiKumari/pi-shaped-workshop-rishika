@@ -24,9 +24,8 @@ jobs:
 
       - name: Install Python deps & scanners
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libyaml-dev
           python -m pip install --upgrade pip
+          pip install PyYAML --only-binary :all:
           pip install -r Security_Compliance_workshop-rishika/day3/app/requirements.txt
           pip install bandit semgrep
 

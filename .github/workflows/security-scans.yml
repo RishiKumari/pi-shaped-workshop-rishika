@@ -1,0 +1,72 @@
+name: Security Scans - Bandit / Semgrep / Gitleaks / ZAP
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run-scans:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Python deps & scanners
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r Security_Compliance_workshop-rishika/day3/app/requirements.txt
+          pip install bandit semgrep
+
+      - name: Create screenshot folder
+        run: mkdir -p Security_Compliance_workshop-rishika/day3/screenshot
+
+      - name: Start Flask app (background)
+        env:
+          APP_SECRET_KEY: ${{ secrets.APP_SECRET_KEY || '' }}
+        run: |
+          nohup python Security_Compliance_workshop-rishika/day3/app/app.py > flask.out 2>&1 &
+          for i in {1..20}; do curl -sSf http://127.0.0.1:8000 && break || sleep 1; done
+
+      - name: Run Bandit (HTML report)
+        run: |
+          bandit -r Security_Compliance_workshop-rishika/day3/app -f html -o Security_Compliance_workshop-rishika/day3/screenshot/bandit-report.html || true
+
+      - name: Run Semgrep (JSON)
+        run: |
+          semgrep --config Security_Compliance_workshop-rishika/day3/.semgrep.yml --json --output Security_Compliance_workshop-rishika/day3/screenshot/semgrep-report.json || true
+
+      - name: Run Gitleaks (Docker)
+        run: |
+          docker run --rm -v "${{ github.workspace }}":/src:z zricethezav/gitleaks:latest detect \
+            --source /src \
+            --config /src/Security_Compliance_workshop-rishika/day3/gitleaks.toml \
+            --report-path /src/Security_Compliance_workshop-rishika/day3/screenshot/gitleaks-report.json || true
+
+      - name: Run OWASP ZAP baseline scan (Docker)
+        run: |
+          docker run --rm -v "${{ github.workspace }}":/zap/wrk/:rw -t owasp/zap2docker-weekly \
+            zap-baseline.py -t http://127.0.0.1:8000 \
+            -r /zap/wrk/Security_Compliance_workshop-rishika/day3/screenshot/zap-report.html \
+            -J /zap/wrk/Security_Compliance_workshop-rishika/day3/screenshot/zap-report.json || true
+
+      - name: Upload security reports (artifact)
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports
+          path: |
+            Security_Compliance_workshop-rishika/day3/screenshot/bandit-report.html
+            Security_Compliance_workshop-rishika/day3/screenshot/semgrep-report.json
+            Security_Compliance_workshop-rishika/day3/screenshot/gitleaks-report.json
+            Security_Compliance_workshop-rishika/day3/screenshot/zap-report.html
+            Security_Compliance_workshop-rishika/day3/screenshot/zap-report.json

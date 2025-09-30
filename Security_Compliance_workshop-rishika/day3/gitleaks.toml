@@ -1,0 +1,10 @@
+title = "Gitleaks rules for training"
+
+
+[[rules]]
+description = "Generic secret via regex for demo"
+regex = '''(?i)(?:secret|passwd|api_key|apikey|token)[\s:=]+[\"']?([A-Za-z0-9\-\_]{8,})'''
+
+
+[allowlist]
+# add allowlist if you have test keys that must be ignored

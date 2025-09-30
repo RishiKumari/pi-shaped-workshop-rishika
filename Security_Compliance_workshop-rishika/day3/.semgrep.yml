@@ -1,0 +1,7 @@
+rules:
+- id: python-insecure-eval
+patterns:
+- pattern: eval($X)
+message: "Use of eval on user-controlled input is insecure. Use ast.literal_eval or validate/parse input."
+languages: [python]
+severity: ERROR

@@ -1,0 +1,4 @@
+Flask==2.0.0
+requests==2.25.1
+# Intentionally we have added vulnerable or outdated dependency
+PyYAML==3.12

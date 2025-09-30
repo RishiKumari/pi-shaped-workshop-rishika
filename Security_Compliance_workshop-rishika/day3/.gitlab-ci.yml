@@ -1,0 +1,73 @@
+stages:
+- sleep 3
+artifacts:
+expire_in: 1 day
+paths:
+- app/
+rules:
+- when: always
+
+
+bandit-scan:
+stage: bandit
+image: python:3.10
+script:
+- pip install bandit
+- bandit -r app -f html -o bandit-report.html || true
+artifacts:
+when: always
+expire_in: 1 day
+paths:
+- bandit-report.html
+needs:
+- job: run-app
+
+
+semgrep-scan:
+stage: semgrep
+image: returntocorp/semgrep:latest
+script:
+- semgrep --config .semgrep.yml --json --output semgrep-report.json || true
+artifacts:
+when: always
+expire_in: 1 day
+paths:
+- semgrep-report.json
+needs:
+- job: run-app
+
+
+gitleaks-scan:
+stage: gitleaks
+image: zricethezav/gitleaks:8.17.0
+variables:
+GITLEAKS_CONFIG: gitleaks.toml
+script:
+- gitleaks detect --source . --report-path gitleaks-report.json --config-path gitleaks.toml || true
+artifacts:
+when: always
+expire_in: 1 day
+paths:
+- gitleaks-report.json
+rules:
+- when: always
+needs:
+- job: run-app
+
+
+owasp-zap-dast:
+stage: zap
+image: owasp/zap2docker-stable
+services: []
+script:
+- echo "Waiting for the app to be reachable..."
+- for i in {1..15}; do curl -s ${ZAP_TARGET} && break || sleep 2; done
+- /usr/bin/zap-baseline.py -t ${ZAP_TARGET} -r zap-report.html -J zap-report.json || true
+artifacts:
+when: always
+expire_in: 1 day
+paths:
+- zap-report.html
+- zap-report.json
+needs:
+- job: run-app

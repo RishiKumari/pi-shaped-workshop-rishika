@@ -21,9 +21,9 @@
 
 ## Folder Structure
 ```
-pi-shaped-workshop-yourname/
-├─ README.md <-- root README with your name
-├─ Security_Compliance_workshop-yourname/
+pi-shaped-workshop-rishika/
+├─ README.md <-- root README with you   r name
+├─ Security_Compliance_workshop-rishika/
 │ ├─ day3/
 │ │ ├─ app/
 │ │ │ ├─ app.py

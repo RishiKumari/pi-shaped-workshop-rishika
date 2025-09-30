@@ -2,6 +2,7 @@ title = "Gitleaks rules for training"
 
 
 [[rules]]
+id = "hardcoded-secret"
 description = "Generic secret via regex for demo"
 regex = '''(?i)(?:secret|passwd|api_key|apikey|token)[\s:=]+[\"']?([A-Za-z0-9\-\_]{8,})'''
 

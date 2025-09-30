@@ -22,11 +22,11 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install Python deps & scanners
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r Security_Compliance_workshop-rishika/day3/app/requirements.txt
-          pip install bandit semgrep
+          pip install --only-binary=:all: pyyaml
+          pip install -r requirements.txt
 
       - name: Create screenshot folder
         run: mkdir -p Security_Compliance_workshop-rishika/day3/screenshot

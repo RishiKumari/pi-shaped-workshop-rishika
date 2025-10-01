@@ -40,6 +40,30 @@ pi-shaped-workshop-rishika/
 └─ .gitignore
 ```
 
+### Pipeline Setup & Execution
+   - Implemented pipeline using GitHub Actions (alternative to GitLab CI).
+   - The workflow runs automatically on each push/PR and generates security scan reports.
+    - #### Tools integrated:
+   - Bandit → Python code security analysis.
+   - Semgrep → Detect insecure coding patterns.
+   - Gitleaks → Identify hardcoded secrets.
+   - OWASP ZAP → Runtime web app vulnerability scan.
+
+  
+### Pipeline Screenshot
+- Security_Compliance_workshop-rishika/day3/screenshot/pipeline.png
+
+## Artifacts Generated
+- Security_Compliance_workshop-rishika/day3/screenshot/bandit-report.html
+- Security_Compliance_workshop-rishika/day3/screenshot/semgrep-report.json
+- Security_Compliance_workshop-rishika/day3/screenshot/gitleaks-report.json
+- Security_Compliance_workshop-rishika/day3/screenshot/zap-report.html (generated via GitHub Actions).
+- Security_Compliance_workshop-rishika/day3/screenshot/zap-report.json (generated via GitHub Actions).
+
+
+> The ZAP report files are generated automatically via GitHub Actions and can be downloaded from the workflow artifacts.
+
+
 ## Core concept answers
 
 
@@ -73,8 +97,3 @@ Integrating scans into CI/CD moves detection earlier in the development lifecycl
 - **Vulnerability 2:** Hardcoded secret in `app.py` (gitleaks)
 - Impact: Credential exposure, unauthorized access if leaked.
 - Fix: Move secret to environment variable and rotate the exposed value.
-
-
-## Evidence of fix
-- Commit `fix/remove-eval-and-secret` shows removal of hardcoded secret and replacing eval with safe parser.
-- Re-run CI: bandaudit/semgrep errors resolved; gitleaks no longer reports the secret.

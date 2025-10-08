@@ -34,19 +34,17 @@ jobs:
         run: mkdir -p screenshots
 
       - name: Run Bandit Scan
-        run: |
-          bandit -r . -f html -o screenshots/bandit-report.html
+        run: bandit -r . -f html -o screenshots/bandit-report.html
 
       - name: Run Semgrep Scan
-        run: |
-          semgrep --config auto --output screenshots/semgrep-report.txt || true
+        run: semgrep --config auto --output screenshots/semgrep-report.txt || true
 
-      - name: Run Trivy Scan (Dependencies)
+      - name: Run Trivy Scan (Filesystem)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           format: 'table'
-          output: 'Security_Compliance_workshop-rishika/day4/screenshots/trivy-report.txt'
+          output: 'screenshots/trivy-report.txt'
           ignore-unfixed: true
 
       - name: Start Flask App for ZAP Scan
@@ -64,4 +62,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: day4-scan-reports
-          path: Security_Compliance_workshop-rishika/day4/screenshots/
+          path: screenshots/

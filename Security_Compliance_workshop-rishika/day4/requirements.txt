@@ -1,5 +1,4 @@
-Flask
-bandit
-semgrep
-trivy
-zapcli
+Flask==3.1.2
+bandit==1.8.6
+semgrep==1.139.0
+

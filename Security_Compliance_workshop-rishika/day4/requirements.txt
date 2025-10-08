@@ -1,0 +1,5 @@
+Flask
+bandit
+semgrep
+trivy
+zapcli
